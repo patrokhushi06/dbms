@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratory Equipment Booking &amp; Maintenance System | Review 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bg-deep:#0D0A08;--bg-surface:#17120F;--bg-card:rgba(28,21,18,0.88);
+      --border-warm:rgba(217,140,85,0.20);--border-bright:rgba(217,140,85,0.55);--border-crimson:rgba(225,29,72,0.38);
+      --cognac:#D97736;--cognac-lt:#F4A558;--amber:#F59E0B;--crimson:#E11D48;--crimson-d:#9F1239;
+      --ruby:#FDA4AF;--emerald:#10B981;--sky:#38BDF8;
+      --glow-cognac:rgba(217,119,54,0.35);--glow-crimson:rgba(225,29,72,0.35);--glow-emerald:rgba(16,185,129,0.30);
+      --text-white:#FDFBF7;--text-warm:#EFE8E1;--text-mid:#C7BDB5;--text-muted:#8C7D73;--text-dark:#38271E;
+      --r-xl:24px;--r-lg:16px;--r-md:10px;--r-sm:6px;--sidebar-w:252px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;}
+    body{background:var(--bg-deep);color:var(--text-warm);min-height:100vh;overflow-x:hidden;}
+    .bg-ambient{position:fixed;inset:0;pointer-events:none;z-index:0;
+      background:radial-gradient(ellipse 900px 600px at 10% 20%,rgba(225,29,72,0.07) 0%,transparent 70%),
+      radial-gradient(ellipse 700px 500px at 90% 80%,rgba(217,119,54,0.07) 0%,transparent 70%),
+      radial-gradient(ellipse 500px 400px at 50% 50%,rgba(159,18,57,0.04) 0%,transparent 70%);}
+    .bg-grid{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.025;
+      background-image:linear-gradient(rgba(217,140,85,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(217,140,85,0.5) 1px,transparent 1px);
+      background-size:60px 60px;}
+    .shell{display:flex;min-height:100vh;position:relative;z-index:1;}
+    .sidebar{width:var(--sidebar-w);background:linear-gradient(180deg,rgba(20,14,11,0.97) 0%,rgba(13,10,8,0.97) 100%);
+      border-right:1px solid var(--border-warm);display:flex;flex-direction:column;
+      position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:100;backdrop-filter:blur(20px);}
+    .sidebar-header{padding:28px 22px 20px;border-bottom:1px solid var(--border-warm);}
+    .sidebar-logo{display:flex;align-items:center;gap:12px;}
+    .logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--crimson-d) 0%,var(--crimson) 100%);border-radius:10px;
+      display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;box-shadow:0 0 20px var(--glow-crimson);flex-shrink:0;}
+    .logo-text{line-height:1.2;}
+    .logo-title{font-size:13px;font-weight:800;color:var(--text-white);letter-spacing:0.5px;}
+    .logo-sub{font-size:10px;color:var(--cognac);font-weight:500;}
+    .sidebar-badge{margin:12px 22px 0;padding:6px 12px;background:rgba(225,29,72,0.12);border:1px solid var(--border-crimson);
+      border-radius:var(--r-sm);font-size:10px;font-weight:600;color:var(--ruby);letter-spacing:0.5px;text-align:center;}
+    .sidebar-section{padding:18px 12px 8px;}
+    .sidebar-section-label{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--text-muted);padding:0 10px 8px;text-transform:uppercase;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-md);cursor:pointer;
+      transition:all 0.2s ease;margin-bottom:2px;font-size:13px;font-weight:500;color:var(--text-muted);}
+    .nav-item:hover{background:rgba(217,119,54,0.08);color:var(--text-warm);}
+    .nav-item.active{background:linear-gradient(135deg,rgba(225,29,72,0.15) 0%,rgba(217,119,54,0.10) 100%);
+      color:var(--text-white);border:1px solid rgba(225,29,72,0.20);}
+    .nav-item.active .nav-icon{color:var(--crimson);}
+    .nav-icon{font-size:14px;width:18px;text-align:center;transition:color 0.2s;}
+    .nav-badge{margin-left:auto;background:var(--crimson);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;min-width:20px;text-align:center;}
+    .nav-badge.green{background:var(--emerald);}
+    .nav-badge.amber{background:var(--amber);color:var(--text-dark);}
+    .sidebar-footer{margin-top:auto;padding:16px 22px;border-top:1px solid var(--border-warm);}
+    .db-status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted);}
+    .db-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 6px var(--glow-emerald);animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{height:64px;display:flex;align-items:center;padding:0 32px;
+      background:rgba(13,10,8,0.80);border-bottom:1px solid var(--border-warm);
+      backdrop-filter:blur(20px);position:sticky;top:0;z-index:50;gap:16px;}
+    .topbar-title{font-size:16px;font-weight:700;
+      background:linear-gradient(90deg,var(--text-white) 40%,var(--cognac));
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+    .btn-sm{padding:7px 16px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;border:1px solid;transition:all 0.2s;}
+    .btn-ghost{background:transparent;border-color:var(--border-warm);color:var(--text-mid);}
+    .btn-ghost:hover{border-color:var(--border-bright);color:var(--text-white);}
+    .btn-crimson{background:linear-gradient(135deg,var(--crimson-d),var(--crimson));border-color:transparent;color:#fff;box-shadow:0 0 16px var(--glow-crimson);}
+    .btn-crimson:hover{box-shadow:0 0 24px var(--glow-crimson);transform:translateY(-1px);}
+    .btn-cognac{background:linear-gradient(135deg,#a8541a,var(--cognac));border-color:transparent;color:#fff;box-shadow:0 0 14px var(--glow-cognac);}
+    .btn-cognac:hover{box-shadow:0 0 22px var(--glow-cognac);transform:translateY(-1px);}
+    .btn-emerald{background:linear-gradient(135deg,#065f46,var(--emerald));border-color:transparent;color:#fff;box-shadow:0 0 14px var(--glow-emerald);}
+    .btn-emerald:hover{box-shadow:0 0 22px var(--glow-emerald);transform:translateY(-1px);}
+    .page{padding:32px;display:none;animation:fadeUp 0.35s ease;}
+    .page.active{display:block;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .card{background:var(--bg-card);border:1px solid var(--border-warm);border-radius:var(--r-lg);padding:24px;
+      backdrop-filter:blur(10px);transition:border-color 0.2s,box-shadow 0.2s;}
+    .card:hover{border-color:var(--border-bright);box-shadow:0 8px 32px rgba(0,0,0,0.4);}
+    .card-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+    .card-icon{width:40px;height:40px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .card-icon.red{background:rgba(225,29,72,0.15);color:var(--crimson);}
+    .card-icon.orange{background:rgba(217,119,54,0.15);color:var(--cognac);}
+    .card-icon.green{background:rgba(16,185,129,0.15);color:var(--emerald);}
+    .card-icon.blue{background:rgba(56,189,248,0.15);color:var(--sky);}
+    .card-icon.amber{background:rgba(245,158,11,0.15);color:var(--amber);}
+    .card-title{font-size:15px;font-weight:700;color:var(--text-white);}
+    .card-sub{font-size:12px;color:var(--text-muted);margin-top:2px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    .stat-card{background:var(--bg-card);border:1px solid var(--border-warm);border-radius:var(--r-lg);padding:22px 24px;position:relative;overflow:hidden;transition:all 0.25s;}
+    .stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--card-glow-a,transparent) 0%,transparent 60%);pointer-events:none;}
+    .stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.5);border-color:var(--border-bright);}
+    .stat-card.red{--card-glow-a:rgba(225,29,72,0.06);}
+    .stat-card.orange{--card-glow-a:rgba(217,119,54,0.06);}
+    .stat-card.green{--card-glow-a:rgba(16,185,129,0.06);}
+    .stat-card.amber{--card-glow-a:rgba(245,158,11,0.06);}
+    .stat-label{font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--text-muted);text-transform:uppercase;}
+    .stat-value{font-size:32px;font-weight:800;margin:8px 0 4px;line-height:1;}
+    .stat-value.red{color:var(--crimson);text-shadow:0 0 20px var(--glow-crimson);}
+    .stat-value.orange{color:var(--cognac);text-shadow:0 0 20px var(--glow-cognac);}
+    .stat-value.green{color:var(--emerald);text-shadow:0 0 20px var(--glow-emerald);}
+    .stat-value.amber{color:var(--amber);}
+    .stat-trend{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px;}
+    .stat-icon{position:absolute;right:18px;top:18px;font-size:28px;opacity:0.08;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;}
+    .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;}
+    .form-group{margin-bottom:16px;}
+    .form-label{font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;display:block;}
+    .form-control{width:100%;padding:11px 14px;background:rgba(23,17,14,0.8);border:1px solid var(--border-warm);
+      border-radius:var(--r-md);color:var(--text-white);font-size:13px;font-weight:500;outline:none;transition:all 0.2s;font-family:'Plus Jakarta Sans',sans-serif;}
+    .form-control:focus{border-color:var(--cognac);box-shadow:0 0 0 3px rgba(217,119,54,0.12);}
+    .form-control::placeholder{color:var(--text-muted);}
+    select.form-control option{background:#1c1510;}
+    .form-row{display:grid;gap:12px;}
+    .form-row.col-2{grid-template-columns:1fr 1fr;}
+    .form-row.col-3{grid-template-columns:1fr 1fr 1fr;}
+    .table-wrap{overflow-x:auto;border-radius:var(--r-md);}
+    table{width:100%;border-collapse:collapse;font-size:13px;}
+    thead tr{background:rgba(217,119,54,0.06);}
+    th{padding:12px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;border-bottom:1px solid var(--border-warm);}
+    td{padding:13px 16px;border-bottom:1px solid rgba(217,140,85,0.07);color:var(--text-warm);vertical-align:middle;}
+    tbody tr{transition:background 0.15s;}
+    tbody tr:hover{background:rgba(217,119,54,0.04);}
+    tbody tr:last-child td{border-bottom:none;}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:0.3px;}
+    .badge-confirmed{background:rgba(16,185,129,0.15);color:var(--emerald);border:1px solid rgba(16,185,129,0.25);}
+    .badge-waitlisted{background:rgba(245,158,11,0.15);color:var(--amber);border:1px solid rgba(245,158,11,0.25);}
+    .badge-cancelled{background:rgba(225,29,72,0.12);color:var(--ruby);border:1px solid rgba(225,29,72,0.22);}
+    .badge-promoted{background:rgba(56,189,248,0.15);color:var(--sky);border:1px solid rgba(56,189,248,0.25);}
+    .badge.dot::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+    .tbl-btn{padding:5px 12px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;border:1px solid;transition:all 0.15s;margin-right:4px;}
+    .tbl-btn-red{border-color:rgba(225,29,72,0.4);color:var(--ruby);background:rgba(225,29,72,0.08);}
+    .tbl-btn-red:hover{background:rgba(225,29,72,0.18);}
+    .tbl-btn-green{border-color:rgba(16,185,129,0.4);color:var(--emerald);background:rgba(16,185,129,0.08);}
+    .tbl-btn-green:hover{background:rgba(16,185,129,0.18);}
+    .tbl-btn-orange{border-color:rgba(217,119,54,0.4);color:var(--cognac-lt);background:rgba(217,119,54,0.08);}
+    .tbl-btn-orange:hover{background:rgba(217,119,54,0.18);}
+    .search-result{background:var(--bg-card);border:1px solid var(--border-warm);border-radius:var(--r-lg);overflow:hidden;transition:all 0.25s;}
+    .search-result:hover{border-color:var(--cognac);box-shadow:0 8px 30px rgba(0,0,0,0.5);}
+    .sr-header{padding:18px 22px;background:linear-gradient(135deg,rgba(225,29,72,0.08) 0%,rgba(217,119,54,0.05) 100%);border-bottom:1px solid var(--border-warm);display:flex;align-items:center;gap:14px;}
+    .sr-train-no{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cognac);font-weight:600;background:rgba(217,119,54,0.12);padding:4px 10px;border-radius:var(--r-sm);}
+    .sr-train-name{font-size:15px;font-weight:700;color:var(--text-white);}
+    .sr-type{font-size:11px;color:var(--text-muted);font-style:italic;}
+    .sr-body{padding:18px 22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}
+    .sr-station{text-align:center;}
+    .sr-station-code{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--text-white);}
+    .sr-station-name{font-size:10px;color:var(--text-muted);margin-top:2px;}
+    .sr-journey{flex:1;display:flex;align-items:center;gap:8px;}
+    .sr-line{flex:1;height:1px;background:linear-gradient(90deg,var(--crimson),var(--cognac));position:relative;}
+    .sr-line::after{content:'\25BA';position:absolute;right:-6px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--cognac);}
+    .sr-duration{font-size:11px;color:var(--cognac);font-weight:600;text-align:center;}
+    .sr-footer{padding:14px 22px;border-top:1px solid var(--border-warm);display:flex;gap:12px;flex-wrap:wrap;}
+    .sr-seat-pill{display:flex;align-items:center;gap:8px;background:rgba(23,17,14,0.8);border:1px solid var(--border-warm);border-radius:var(--r-sm);padding:8px 14px;cursor:pointer;transition:all 0.2s;}
+    .sr-seat-pill:hover{border-color:var(--cognac);background:rgba(217,119,54,0.08);}
+    .sr-class{font-size:11px;font-weight:700;color:var(--text-warm);}
+    .sr-avail{font-size:11px;font-weight:600;}
+    .avail-ok{color:var(--emerald);}
+    .avail-wl{color:var(--amber);}
+    .sr-fare{font-size:11px;color:var(--text-muted);}
+    .terminal{background:#060402;border:1px solid rgba(217,140,85,0.15);border-radius:var(--r-md);padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;height:200px;overflow-y:auto;scroll-behavior:smooth;}
+    .terminal::-webkit-scrollbar{width:4px;}
+    .terminal::-webkit-scrollbar-track{background:transparent;}
+    .terminal::-webkit-scrollbar-thumb{background:rgba(217,140,85,0.3);border-radius:2px;}
+    .log-line{margin-bottom:6px;line-height:1.6;}
+    .log-time{color:var(--text-muted);}
+    .log-ok{color:var(--emerald);}
+    .log-warn{color:var(--amber);}
+    .log-err{color:var(--crimson);}
+    .log-info{color:var(--sky);}
+    .log-sql{color:var(--cognac-lt);}
+    .wl-item{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:var(--r-md);background:rgba(23,17,14,0.7);border:1px solid var(--border-warm);margin-bottom:8px;transition:all 0.2s;}
+    .wl-item:hover{border-color:var(--border-bright);}
+    .wl-pos{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--crimson-d),var(--crimson));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+    .wl-pos.top{background:linear-gradient(135deg,#a8541a,var(--cognac));}
+    .wl-info{flex:1;}
+    .wl-name{font-size:13px;font-weight:600;color:var(--text-white);}
+    .wl-detail{font-size:11px;color:var(--text-muted);margin-top:2px;}
+    .wl-actions{display:flex;gap:8px;}
+    .fare-breakdown{background:rgba(23,17,14,0.8);border:1px solid var(--border-warm);border-radius:var(--r-md);padding:20px;}
+    .fare-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(217,140,85,0.07);}
+    .fare-row:last-child{border-bottom:none;}
+    .fare-row.total{padding-top:14px;border-top:1px solid var(--border-bright);margin-top:4px;}
+    .fare-label{font-size:12px;color:var(--text-mid);}
+    .fare-val{font-size:13px;font-weight:700;color:var(--text-white);font-family:'JetBrains Mono',monospace;}
+    .fare-val.total{color:var(--cognac);font-size:18px;text-shadow:0 0 16px var(--glow-cognac);}
+    .progress-bar{height:6px;background:rgba(217,140,85,0.10);border-radius:3px;overflow:hidden;margin-top:8px;}
+    .progress-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+    .fill-green{background:linear-gradient(90deg,#065f46,var(--emerald));}
+    .fill-amber{background:linear-gradient(90deg,#92400e,var(--amber));}
+    .fill-red{background:linear-gradient(90deg,var(--crimson-d),var(--crimson));}
+    .bar-chart{display:flex;align-items:flex-end;gap:10px;height:120px;margin-top:12px;}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
+    .bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;}
+    .bar-label{font-size:9px;color:var(--text-muted);text-align:center;white-space:nowrap;}
+    .bar-val{font-size:10px;color:var(--text-mid);font-weight:600;}
+    .section-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .section-title{font-size:20px;font-weight:800;color:var(--text-white);}
+    .section-sub{font-size:12px;color:var(--text-muted);margin-top:3px;}
+    .divider{height:1px;background:var(--border-warm);margin:24px 0;}
+    #toast-container{position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+    .toast{padding:14px 20px;border-radius:var(--r-md);background:rgba(28,21,18,0.97);border-left:3px solid;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,0.6);font-size:13px;font-weight:500;max-width:340px;animation:slideIn 0.3s ease;display:flex;align-items:flex-start;gap:10px;}
+    .toast-title{font-weight:700;margin-bottom:2px;}
+    .toast-msg{font-size:12px;color:var(--text-muted);}
+    @keyframes slideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
+    .toast.success{border-color:var(--emerald);}.toast.success .ti{color:var(--emerald);}
+    .toast.error{border-color:var(--crimson);}.toast.error .ti{color:var(--crimson);}
+    .toast.warn{border-color:var(--amber);}.toast.warn .ti{color:var(--amber);}
+    .toast.info{border-color:var(--sky);}.toast.info .ti{color:var(--sky);}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(5,3,2,0.85);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;}
+    .modal-backdrop.open{display:flex;animation:fadeIn 0.2s ease;}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    .modal{background:linear-gradient(145deg,rgba(28,21,18,0.99) 0%,rgba(20,14,11,0.99) 100%);border:1px solid var(--border-warm);border-radius:var(--r-xl);padding:32px;min-width:440px;max-width:580px;width:90%;box-shadow:0 24px 80px rgba(0,0,0,0.8);animation:modalIn 0.25s ease;max-height:90vh;overflow-y:auto;}
+    @keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+    .modal-title{font-size:18px;font-weight:800;color:var(--text-white);}
+    .modal-close{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:20px;padding:4px;transition:color 0.2s;}
+    .modal-close:hover{color:var(--text-white);}
+    .ticket{background:linear-gradient(135deg,rgba(35,24,18,0.95) 0%,rgba(20,14,11,0.95) 100%);border:1px solid var(--border-bright);border-radius:var(--r-lg);overflow:hidden;}
+    .ticket-stripe{height:4px;background:linear-gradient(90deg,var(--crimson-d),var(--crimson),var(--cognac),var(--amber));}
+    .ticket-header{padding:20px 24px;background:linear-gradient(135deg,rgba(225,29,72,0.08),rgba(217,119,54,0.05));border-bottom:1px dashed rgba(217,140,85,0.2);display:flex;align-items:center;justify-content:space-between;}
+    .ticket-body{padding:20px 24px;}
+    .ticket-row{display:flex;justify-content:space-between;gap:16px;margin-bottom:14px;}
+    .ticket-field{flex:1;}
+    .ticket-field-label{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+    .ticket-field-val{font-size:13px;font-weight:700;color:var(--text-white);}
+    .pnr-code{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:800;color:var(--cognac);letter-spacing:2px;text-shadow:0 0 20px var(--glow-cognac);}
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:rgba(217,140,85,0.25);border-radius:3px;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(217,140,85,0.45);}
+    .empty-state{text-align:center;padding:48px 24px;}
+    .empty-icon{font-size:48px;margin-bottom:12px;opacity:0.3;}
+    .empty-title{font-size:15px;font-weight:600;color:var(--text-mid);}
+    .empty-sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
+    .report-metric{text-align:center;padding:20px;border:1px solid var(--border-warm);border-radius:var(--r-lg);background:var(--bg-card);}
+    .report-num{font-size:28px;font-weight:800;}
+    .report-label{font-size:11px;color:var(--text-muted);margin-top:4px;}
+    .entity-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+    .entity-tabs{display:flex;gap:4px;}
+    .etab{padding:6px 14px;border-radius:var(--r-sm);font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border-warm);color:var(--text-muted);transition:all 0.15s;}
+    .etab.active{background:rgba(217,119,54,0.12);border-color:var(--cognac);color:var(--cognac);}
+    .text-cognac{color:var(--cognac);}.text-crimson{color:var(--crimson);}.text-emerald{color:var(--emerald);}.text-amber{color:var(--amber);}
+    .mono{font-family:'JetBrains Mono',monospace;}
+    .mb-4{margin-bottom:16px;}.mb-6{margin-bottom:24px;}.mt-4{margin-top:16px;}.mt-6{margin-top:24px;}
+    .fw-700{font-weight:700;}.fw-600{font-weight:600;}
+    .text-muted{color:var(--text-muted);}.text-white{color:var(--text-white);}
+    .page-banner{border-radius:var(--r-lg);padding:28px 32px;margin-bottom:28px;background:linear-gradient(135deg,rgba(159,18,57,0.12) 0%,rgba(217,119,54,0.06) 100%);border:1px solid var(--border-crimson);display:flex;align-items:center;gap:20px;position:relative;overflow:hidden;}
+    .page-banner::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;background:radial-gradient(circle,rgba(225,29,72,0.07) 0%,transparent 70%);pointer-events:none;}
+    .banner-icon{font-size:36px;flex-shrink:0;}
+    .banner-title{font-size:22px;font-weight:800;color:var(--text-white);font-family:'Cinzel',serif;}
+    .banner-sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
+    #searchResultsArea{display:flex;flex-direction:column;gap:14px;margin-top:20px;}
+  </style>
+</head>
+<body>
+<div class="bg-ambient"></div>
+<div class="bg-grid"></div>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="fa-solid fa-flask"></i></div>
+        <div class="logo-text"><div class="logo-title">LABEQUIP</div><div class="logo-sub">Booking &amp; Maintenance</div></div>
+      </div>
+      <div class="sidebar-badge">DBMS &bull; REVIEW 2</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Overview</div>
+      <div class="nav-item active" onclick="navigate('dashboard')"><i class="fa-solid fa-gauge-high nav-icon"></i> Dashboard</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Booking</div>
+      <div class="nav-item" onclick="navigate('availability')"><i class="fa-solid fa-calendar-check nav-icon"></i> Availability</div>
+      <div class="nav-item" onclick="navigate('book')"><i class="fa-solid fa-flask-vial nav-icon"></i> Book Equipment</div>
+      <div class="nav-item" onclick="navigate('bookings')"><i class="fa-solid fa-list-check nav-icon"></i> All Bookings <span class="nav-badge" id="nb-bookings">0</span></div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Safety &amp; Service</div>
+      <div class="nav-item" onclick="navigate('maintenance')"><i class="fa-solid fa-screwdriver-wrench nav-icon"></i> Maintenance <span class="nav-badge amber" id="nb-maint">0</span></div>
+      <div class="nav-item" onclick="navigate('calibration')"><i class="fa-solid fa-gauge nav-icon"></i> Calibration</div>
+      <div class="nav-item" onclick="navigate('stock')"><i class="fa-solid fa-boxes-stacked nav-icon"></i> Consumable Stock</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Data &amp; Reports</div>
+      <div class="nav-item" onclick="navigate('equipment')"><i class="fa-solid fa-database nav-icon"></i> Equipment Manager</div>
+      <div class="nav-item" onclick="navigate('reports')"><i class="fa-solid fa-chart-pie nav-icon"></i> Analytics Reports</div>
+    </div>
+    <div class="sidebar-footer"><div class="db-status"><div class="db-dot"></div><span>LabEquipmentDB &bull; PostgreSQL 15+</span></div></div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Dashboard Overview</span>
+      <div class="topbar-right"><button class="btn-sm btn-crimson" onclick="navigate('book')"><i class="fa-solid fa-plus"></i> New Booking</button></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-banner"><div class="banner-icon">&#x1F52C;</div><div>
+        <div class="banner-title">Laboratory Equipment Booking &amp; Maintenance</div>
+        <div class="banner-sub">Conflict-aware booking &bull; Calibration &amp; service tracking &bull; Breakdown lifecycle &bull; Consumable stock &bull; Analytics</div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon"><i class="fa-solid fa-microscope"></i></div><div class="stat-label">Active Equipment</div><div class="stat-value green" id="kpi-active">0</div><div class="stat-trend" id="kpi-total">of 0 total</div></div>
+        <div class="stat-card red"><div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div><div class="stat-label">Approved Bookings</div><div class="stat-value red" id="kpi-approved">0</div><div class="stat-trend" id="kpi-pending">0 pending</div></div>
+        <div class="stat-card amber"><div class="stat-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div><div class="stat-label">Open Breakdowns</div><div class="stat-value amber" id="kpi-breakdowns">0</div><div class="stat-trend">Unresolved</div></div>
+        <div class="stat-card orange"><div class="stat-icon"><i class="fa-solid fa-gauge"></i></div><div class="stat-label">Calibration Overdue</div><div class="stat-value orange" id="kpi-cal">0</div><div class="stat-trend" id="kpi-stock">0 low-stock items</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><div class="card-header"><div class="card-icon red"><i class="fa-solid fa-list-check"></i></div><div><div class="card-title">Recent Bookings</div><div class="card-sub">Latest requests</div></div></div>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th>Requester</th><th>Equipment</th><th>Date</th><th>Status</th></tr></thead><tbody id="dash-recent"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div class="card-icon orange"><i class="fa-solid fa-chart-bar"></i></div><div><div class="card-title">Equipment Utilization</div><div class="card-sub">Booked vs available hours</div></div></div><div id="dash-util"></div></div>
+      </div>
+    </div>
+
+    <!-- AVAILABILITY -->
+    <div class="page" id="page-availability">
+      <div class="section-heading"><div><div class="section-title">Availability</div><div class="section-sub">Active equipment against every time slot on a date</div></div></div>
+      <div class="card mb-6"><div class="form-row col-3">
+        <div class="form-group"><label class="form-label">Date</label><select class="form-control" id="av-date"></select></div>
+        <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn-sm btn-crimson" style="width:100%;padding:12px;" onclick="loadAvailability()"><i class="fa-solid fa-magnifying-glass"></i> Check</button></div>
+      </div></div>
+      <div class="card"><div class="table-wrap" id="av-table"></div></div>
+    </div>
+
+    <!-- BOOK -->
+    <div class="page" id="page-book">
+      <div class="section-heading"><div><div class="section-title">Book Equipment</div><div class="section-sub">The database rejects overlaps, inactive equipment and expired calibration</div></div></div>
+      <div class="card"><div class="form-row col-3 mb-4">
+        <div class="form-group"><label class="form-label">Requester</label><select class="form-control" id="b-user"></select></div>
+        <div class="form-group"><label class="form-label">Equipment</label><select class="form-control" id="b-equip"></select></div>
+        <div class="form-group"><label class="form-label">Time Slot</label><select class="form-control" id="b-slot"></select></div>
+      </div><div class="form-row col-3">
+        <div class="form-group"><label class="form-label">Purpose</label><input class="form-control" id="b-purpose" placeholder="e.g. Filter circuit measurements"></div>
+        <div class="form-group"><label class="form-label">Request As</label><select class="form-control" id="b-status"><option value="PENDING">PENDING (needs approval)</option><option value="APPROVED">APPROVED (admin)</option></select></div>
+        <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn-sm btn-crimson" style="width:100%;padding:12px;" onclick="submitBooking()"><i class="fa-solid fa-flask-vial"></i> Submit Booking</button></div>
+      </div></div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="page" id="page-bookings">
+      <div class="section-heading"><div><div class="section-title">All Bookings</div><div class="section-sub">Audit trail: requester, equipment, status and logged usage</div></div><button class="btn-sm btn-cognac" onclick="navigate('book')"><i class="fa-solid fa-plus"></i> New Booking</button></div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>#</th><th>Requester</th><th>Equipment</th><th>Lab</th><th>Date</th><th>Time</th><th>Status</th><th>Hours</th><th>Actions</th></tr></thead><tbody id="bookings-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- MAINTENANCE -->
+    <div class="page" id="page-maintenance">
+      <div class="section-heading"><div><div class="section-title">Maintenance &amp; Breakdowns</div><div class="section-sub">Reporting a breakdown, starting and completing jobs updates equipment status automatically</div></div></div>
+      <div class="grid-2 mb-6">
+        <div class="card"><div class="card-header"><div class="card-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div><div><div class="card-title">Report Breakdown</div></div></div>
+          <div class="form-group mb-4"><label class="form-label">Equipment</label><select class="form-control" id="bd-equip"></select></div>
+          <div class="form-group mb-4"><label class="form-label">Description</label><input class="form-control" id="bd-desc" placeholder="What failed?"></div>
+          <button class="btn-sm btn-crimson" onclick="reportBreakdown()">Report Breakdown</button></div>
+        <div class="card"><div class="card-header"><div class="card-icon amber"><i class="fa-solid fa-screwdriver-wrench"></i></div><div><div class="card-title">Create Maintenance Job</div></div></div>
+          <div class="form-row col-3 mb-4">
+            <div class="form-group"><label class="form-label">Equipment</label><select class="form-control" id="mj-equip"></select></div>
+            <div class="form-group"><label class="form-label">Vendor</label><select class="form-control" id="mj-vendor"></select></div>
+            <div class="form-group"><label class="form-label">Breakdown</label><select class="form-control" id="mj-bd"></select></div></div>
+          <div class="form-row col-3"><div class="form-group"><label class="form-label">Work</label><input class="form-control" id="mj-desc" placeholder="Work to be done"></div>
+            <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="mj-status"><option value="IN_PROGRESS">IN_PROGRESS</option><option value="SCHEDULED">SCHEDULED</option></select></div>
+            <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn-sm btn-cognac" style="width:100%;padding:12px;" onclick="createJob()">Create Job</button></div></div></div>
+      </div>
+      <div class="card mb-6"><div class="card-header"><div class="card-icon blue"><i class="fa-solid fa-wrench"></i></div><div><div class="card-title">Maintenance Jobs</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Equipment</th><th>Vendor</th><th>Work</th><th>Start</th><th>Done</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead><tbody id="mj-tbody"></tbody></table></div></div>
+      <div class="card"><div class="card-header"><div class="card-icon orange"><i class="fa-solid fa-clock"></i></div><div><div class="card-title">Downtime Report</div></div></div><div class="table-wrap" id="downtime-table"></div></div>
+    </div>
+
+    <!-- CALIBRATION -->
+    <div class="page" id="page-calibration">
+      <div class="section-heading"><div><div class="section-title">Calibration</div><div class="section-sub">Latest calibration per equipment, with due status</div></div></div>
+      <div class="card mb-6"><div class="form-row col-3 mb-4">
+        <div class="form-group"><label class="form-label">Equipment</label><select class="form-control" id="cal-equip"></select></div>
+        <div class="form-group"><label class="form-label">Calibrated On</label><input type="date" class="form-control" id="cal-date"></div>
+        <div class="form-group"><label class="form-label">Next Due</label><input type="date" class="form-control" id="cal-due"></div></div>
+        <div class="form-row col-3"><div class="form-group"><label class="form-label">Performed By</label><input class="form-control" id="cal-by" placeholder="Agency or person"></div>
+        <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn-sm btn-crimson" style="width:100%;padding:12px;" onclick="addCalibration()">Record Calibration</button></div></div></div>
+      <div class="card"><div class="table-wrap" id="cal-table"></div></div>
+    </div>
+
+    <!-- STOCK -->
+    <div class="page" id="page-stock">
+      <div class="section-heading"><div><div class="section-title">Consumable Stock</div><div class="section-sub">Stock can never go below zero (database CHECK)</div></div></div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>Item</th><th>Equipment</th><th>Lab</th><th>Stock</th><th>Reorder</th><th>Shortfall</th><th>Status</th><th>Actions</th></tr></thead><tbody id="stock-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- EQUIPMENT -->
+    <div class="page" id="page-equipment">
+      <div class="section-heading"><div><div class="section-title">Equipment Manager</div><div class="section-sub">Register equipment and change its status</div></div></div>
+      <div class="card mb-6"><div class="form-row col-3 mb-4">
+        <div class="form-group"><label class="form-label">Name</label><input class="form-control" id="eq-name"></div>
+        <div class="form-group"><label class="form-label">Serial No</label><input class="form-control" id="eq-serial"></div>
+        <div class="form-group"><label class="form-label">Purchase Date</label><input type="date" class="form-control" id="eq-date"></div></div>
+        <div class="form-row col-3"><div class="form-group"><label class="form-label">Laboratory</label><select class="form-control" id="eq-lab"></select></div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-control" id="eq-cat"></select></div>
+        <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn-sm btn-crimson" style="width:100%;padding:12px;" onclick="addEquipment()">Add Equipment</button></div></div></div>
+      <div class="card"><div class="table-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Serial</th><th>Lab</th><th>Category</th><th>Purchased</th><th>Status</th><th>Change Status</th></tr></thead><tbody id="eq-tbody"></tbody></table></div></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="section-heading"><div><div class="section-title">Analytics &amp; Reports</div><div class="section-sub">The six Review 2 SQL reports</div></div></div>
+      <div class="card">
+        <div class="entity-tabs mb-4">
+          <div class="etab active" onclick="showReport('utilization',event)">Utilization</div>
+          <div class="etab" onclick="showReport('calibration',event)">Calibration Due</div>
+          <div class="etab" onclick="showReport('downtime',event)">Downtime</div>
+          <div class="etab" onclick="showReport('stock',event)">Consumable Stock</div>
+          <div class="etab" onclick="showReport('audit',event)">Booking Audit</div>
+        </div>
+        <div class="table-wrap" id="report-table"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div id="toast-container"></div>
+
+<script>
+let DB={labs:[],categories:[],vendors:[],users:[],slots:[],equipment:[]};
+const TITLES={dashboard:'Dashboard Overview',availability:'Availability',book:'Book Equipment',bookings:'All Bookings',maintenance:'Maintenance & Breakdowns',calibration:'Calibration',stock:'Consumable Stock',equipment:'Equipment Manager',reports:'Analytics & Reports'};
+const GOOD=['ACTIVE','APPROVED','COMPLETED','FREE','OK','RESOLVED'];
+const WARN=['PENDING','IN_PROGRESS','SCHEDULED','UNDER_MAINTENANCE','IN_REPAIR','REPORTED','DUE SOON','LOW STOCK'];
+const BAD=['REJECTED','CANCELLED','OVERDUE','BROKEN','RETIRED','BOOKED','OUT OF STOCK','NOT READY - CALIBRATION OVERDUE'];
+
+async function api(path,opts){
+  const res=await fetch(path,opts);let data=null;
+  try{data=await res.json();}catch(e){}
+  if(!res.ok)throw new Error((data&&data.error)||('Request failed ('+res.status+')'));
+  return data;
+}
+function post(path,body){return api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})});}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function badge(s){var c=GOOD.includes(s)?'confirmed':WARN.includes(s)?'waitlisted':BAD.includes(s)?'cancelled':'promoted';return '<span class="badge badge-'+c+' dot">'+esc(s)+'</span>';}
+function money(n){return '\u20B9'+Number(n||0).toLocaleString('en-IN');}
+function t5(t){return String(t).slice(0,5);}
+function opts(list,label){return list.map(function(x){return '<option value="'+x.id+'">'+esc(label(x))+'</option>';}).join('');}
+function fill(id,html){document.getElementById(id).innerHTML=html;}
+function val(id){return document.getElementById(id).value;}
+function toast(title,msg,type){
+  var icons={success:'fa-circle-check',error:'fa-circle-xmark',warn:'fa-triangle-exclamation',info:'fa-circle-info'};
+  var el=document.createElement('div');el.className='toast '+(type||'info');
+  el.innerHTML='<i class="fa-solid '+(icons[type||'info'])+' ti"></i><div><div class="toast-title">'+esc(title)+'</div><div class="toast-msg">'+esc(msg)+'</div></div>';
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(function(){el.style.opacity='0';el.style.transition='all .3s';setTimeout(function(){el.remove();},300);},4500);
+}
+async function act(fn,okTitle,okMsg,after){
+  try{await fn();toast(okTitle,okMsg,'success');}catch(e){toast('Rejected',e.message,'error');return;}
+  await loadBootstrap();if(after)after();
+}
+function table(cols,data,render){
+  if(!data.length)return '<div style="padding:24px;color:var(--text-muted);">No records.</div>';
+  return '<table><thead><tr>'+cols.map(function(c){return '<th>'+esc(c[1])+'</th>';}).join('')+'</tr></thead><tbody>'+
+    data.map(function(r){return '<tr>'+cols.map(function(c){var v=r[c[0]];
+      if(render&&render[c[0]])return '<td>'+render[c[0]](v,r)+'</td>';return '<td>'+esc(v)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>';
+}
+const STATUSCOLS={status:badge,booking_status:badge,equipment_status:badge,breakdown_status:badge,maintenance_status:badge,calibration_status:badge,stock_status:badge,availability:badge};
+
+async function loadBootstrap(){
+  DB=await api('/api/bootstrap');
+  try{
+    const d=await api('/api/dashboard');
+    document.getElementById('nb-bookings').textContent=d.kpi.pending_bookings+d.kpi.approved_bookings;
+    document.getElementById('nb-maint').textContent=d.kpi.open_breakdowns;
+  }catch(e){}
+}
+function fillSelects(){
+  const slotLabel=function(s){return s.slot_date+'  '+t5(s.start_time)+'-'+t5(s.end_time);};
+  const equipLabel=function(e){return e.name+' ('+e.status+')';};
+  fill('b-user',opts(DB.users,function(u){return u.name+' - '+u.role;}));
+  fill('b-equip',opts(DB.equipment,equipLabel));fill('b-slot',opts(DB.slots,slotLabel));
+  ['bd-equip','mj-equip','cal-equip'].forEach(function(id){fill(id,opts(DB.equipment,function(e){return e.name;}));});
+  fill('mj-vendor',opts(DB.vendors,function(v){return v.name;}));
+  fill('eq-lab',opts(DB.labs,function(l){return l.name;}));fill('eq-cat',opts(DB.categories,function(c){return c.name;}));
+  const dates=[...new Set(DB.slots.map(function(s){return s.slot_date;}))];
+  fill('av-date',dates.map(function(d){return '<option>'+d+'</option>';}).join(''));
+}
+function navigate(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+  document.getElementById('page-'+p).classList.add('active');
+  var ni=document.querySelector('.nav-item[onclick="navigate(\''+p+'\')"]');if(ni)ni.classList.add('active');
+  document.getElementById('topbar-title').textContent=TITLES[p]||p;
+  fillSelects();
+  ({dashboard:renderDashboard,availability:loadAvailability,bookings:renderBookings,maintenance:renderMaintenance,calibration:renderCalibration,stock:renderStock,equipment:renderEquipment,reports:function(){showReport('utilization');}}[p]||function(){})();
+}
+
+async function renderDashboard(){
+  const d=await api('/api/dashboard'),k=d.kpi;
+  fill('kpi-active',k.active_equipment);fill('kpi-total','of '+k.total_equipment+' total');
+  fill('kpi-approved',k.approved_bookings);fill('kpi-pending',k.pending_bookings+' pending');
+  fill('kpi-breakdowns',k.open_breakdowns);fill('kpi-cal',k.overdue_calibrations);fill('kpi-stock',k.low_stock_items+' low-stock items');
+  fill('dash-recent',d.recent.map(function(b){return '<tr><td>'+b.booking_id+'</td><td>'+esc(b.requester)+'</td><td>'+esc(b.equipment_name)+'</td><td>'+b.slot_date+'</td><td>'+badge(b.booking_status)+'</td></tr>';}).join(''));
+  fill('dash-util',d.utilization.map(function(u){return '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;"><span>'+esc(u.equipment_name)+'</span><span class="text-cognac">'+u.utilization_pct+'%</span></div><div class="progress-bar"><div class="progress-fill" style="width:'+Math.min(u.utilization_pct,100)+'%"></div></div></div>';}).join(''));
+}
+async function loadAvailability(){
+  const date=val('av-date');if(!date){fill('av-table','');return;}
+  const rows=await api('/api/availability?date='+date);
+  fill('av-table',table([['equipment_name','Equipment'],['laboratory','Laboratory'],['start_time','From'],['end_time','To'],['availability','Availability']],rows,
+    {start_time:t5,end_time:t5,availability:badge}));
+}
+function submitBooking(){
+  act(function(){return post('/api/bookings',{userId:val('b-user'),equipmentId:val('b-equip'),slotId:val('b-slot'),purpose:val('b-purpose'),status:val('b-status')});},
+    'Booking Created','The database accepted the booking.',function(){navigate('bookings');});
+}
+async function renderBookings(){
+  const rows=await api('/api/bookings');
+  fill('bookings-tbody',rows.map(function(b){
+    const id=b.booking_id,st=b.booking_status,btn=function(s,l,c){return '<button class="btn-sm '+c+'" onclick="setBooking('+id+',\''+s+'\')">'+l+'</button> ';};
+    let a='';
+    if(st==='PENDING')a=btn('APPROVED','Approve','btn-emerald')+btn('REJECTED','Reject','btn-ghost');
+    if(st==='APPROVED')a=btn('COMPLETED','Complete','btn-cognac')+btn('CANCELLED','Cancel','btn-ghost');
+    if(st==='COMPLETED')a='<button class="btn-sm btn-ghost" onclick="logUsage('+id+')">Log Usage</button>';
+    return '<tr><td>'+id+'</td><td>'+esc(b.requester)+'</td><td>'+esc(b.equipment_name)+'</td><td>'+esc(b.laboratory)+'</td><td>'+b.slot_date+'</td><td>'+t5(b.start_time)+'-'+t5(b.end_time)+'</td><td>'+badge(st)+'</td><td>'+b.hours_logged+'</td><td>'+a+'</td></tr>';}).join(''));
+}
+function setBooking(id,s){act(function(){return post('/api/bookings/'+id+'/status',{status:s});},'Booking Updated','Booking '+id+' is now '+s+'.',renderBookings);}
+function logUsage(id){
+  const h=prompt('Hours used (0.25 - 12)?','1');if(!h)return;const d=prompt('Work done?','Session completed');if(!d)return;
+  act(function(){return post('/api/usage',{bookingId:id,hours:h,details:d});},'Usage Logged',h+' hours recorded.',renderBookings);
+}
+async function renderMaintenance(){
+  const [jobs,dt,ob]=await Promise.all([api('/api/maintenance'),api('/api/reports/downtime'),api('/api/breakdowns/open')]);
+  fill('mj-bd','<option value="">No linked breakdown</option>'+opts(ob,function(b){return '#'+b.id+' '+b.equipment_name+' - '+b.description;}));
+  fill('mj-tbody',jobs.map(function(j){
+    let a='';
+    if(j.status==='SCHEDULED')a='<button class="btn-sm btn-cognac" onclick="jobStatus('+j.maintenance_id+',\'IN_PROGRESS\')">Start</button>';
+    if(j.status==='IN_PROGRESS')a='<button class="btn-sm btn-emerald" onclick="completeJob('+j.maintenance_id+')">Complete</button>';
+    return '<tr><td>'+j.maintenance_id+'</td><td>'+esc(j.equipment_name)+'</td><td>'+esc(j.vendor_name)+'</td><td>'+esc(j.description)+'</td><td>'+j.start_date+'</td><td>'+(j.completion_date||'-')+'</td><td>'+money(j.cost)+'</td><td>'+badge(j.status)+'</td><td>'+a+'</td></tr>';}).join(''));
+  fill('downtime-table',table([['breakdown_id','#'],['equipment_name','Equipment'],['reported_on','Reported'],['resolved_on','Resolved'],['downtime_days','Downtime (days)'],['breakdown_status','Status'],['vendor_name','Vendor'],['maintenance_cost','Cost']],dt.detail,
+    Object.assign({maintenance_cost:money,resolved_on:function(v){return v||'-';},vendor_name:function(v){return esc(v||'-');}},STATUSCOLS)));
+}
+function reportBreakdown(){act(function(){return post('/api/breakdowns',{equipmentId:val('bd-equip'),description:val('bd-desc')});},'Breakdown Reported','Equipment marked BROKEN by trigger.',renderMaintenance);}
+function createJob(){act(function(){return post('/api/maintenance',{equipmentId:val('mj-equip'),vendorId:val('mj-vendor'),breakdownId:val('mj-bd'),description:val('mj-desc'),status:val('mj-status')});},'Job Created','Maintenance job saved.',renderMaintenance);}
+function jobStatus(id,s){act(function(){return post('/api/maintenance/'+id+'/status',{status:s});},'Job Updated','Job '+id+' is now '+s+'.',renderMaintenance);}
+function completeJob(id){const c=prompt('Final cost (INR)?','0');if(c===null)return;
+  act(function(){return post('/api/maintenance/'+id+'/status',{status:'COMPLETED',cost:c});},'Job Completed','Breakdown resolved and equipment returned to ACTIVE when no other breakdown is open.',renderMaintenance);}
+async function renderCalibration(){
+  const rows=await api('/api/reports/calibration');
+  fill('cal-table',table([['equipment_name','Equipment'],['laboratory','Laboratory'],['last_calibrated','Last Calibrated'],['next_due_date','Next Due'],['days_to_due','Days To Due'],['calibration_status','Status']],rows,STATUSCOLS));
+}
+function addCalibration(){act(function(){return post('/api/calibrations',{equipmentId:val('cal-equip'),calibrationDate:val('cal-date'),nextDueDate:val('cal-due'),performedBy:val('cal-by')});},'Calibration Recorded','Saved.',renderCalibration);}
+async function renderStock(){
+  const rows=await api('/api/reports/stock');
+  fill('stock-tbody',rows.map(function(s){return '<tr><td>'+esc(s.item_name)+'</td><td>'+esc(s.equipment_name)+'</td><td>'+esc(s.laboratory)+'</td><td>'+s.stock_quantity+' '+esc(s.unit)+'</td><td>'+s.reorder_level+'</td><td>'+s.shortfall+'</td><td>'+badge(s.stock_status)+'</td><td><button class="btn-sm btn-ghost" onclick="stockChange('+s.consumable_id+',\'use\')">Use</button> <button class="btn-sm btn-emerald" onclick="stockChange('+s.consumable_id+',\'restock\')">Restock</button></td></tr>';}).join(''));
+}
+function stockChange(id,mode){const q=prompt('Quantity to '+mode+'?','1');if(!q)return;
+  act(function(){return post('/api/consumables/'+id+'/'+mode,{qty:q});},'Stock Updated',mode+' '+q+' recorded.',renderStock);}
+async function renderEquipment(){
+  const rows=await api('/api/equipment');
+  const sel=function(id,cur){return '<select class="form-control" onchange="setEquip('+id+',this.value)">'+['ACTIVE','UNDER_MAINTENANCE','BROKEN','RETIRED'].map(function(s){return '<option'+(s===cur?' selected':'')+'>'+s+'</option>';}).join('')+'</select>';};
+  fill('eq-tbody',rows.map(function(e){return '<tr><td>'+e.equipment_id+'</td><td>'+esc(e.name)+'</td><td>'+esc(e.serial_no)+'</td><td>'+esc(e.laboratory)+'</td><td>'+esc(e.category)+'</td><td>'+e.purchase_date+'</td><td>'+badge(e.status)+'</td><td>'+sel(e.equipment_id,e.status)+'</td></tr>';}).join(''));
+}
+function addEquipment(){act(function(){return post('/api/equipment',{name:val('eq-name'),serialNo:val('eq-serial'),purchaseDate:val('eq-date'),laboratoryId:val('eq-lab'),categoryId:val('eq-cat')});},'Equipment Added','Registered as ACTIVE.',renderEquipment);}
+function setEquip(id,s){act(function(){return post('/api/equipment/'+id+'/status',{status:s});},'Status Changed','Equipment '+id+' is now '+s+'.',renderEquipment);}
+
+const REPORTS={
+  utilization:[[['equipment_name','Equipment'],['category','Category'],['laboratory','Laboratory'],['booked_hours','Booked h'],['available_hours','Available h'],['utilization_pct','Utilization %']],'/api/reports/utilization'],
+  calibration:[[['equipment_name','Equipment'],['equipment_status','Status'],['last_calibrated','Last'],['next_due_date','Next Due'],['days_to_due','Days'],['calibration_status','Calibration']],'/api/reports/calibration'],
+  stock:[[['item_name','Item'],['equipment_name','Equipment'],['stock_quantity','Stock'],['reorder_level','Reorder'],['shortfall','Shortfall'],['stock_status','Status']],'/api/reports/stock'],
+  audit:[[['booking_id','#'],['requester','Requester'],['equipment_name','Equipment'],['slot_date','Date'],['booking_status','Status'],['usage_entries','Logs'],['hours_logged','Hours']],'/api/reports/audit']
+};
+async function showReport(name,evt){
+  if(evt){document.querySelectorAll('#page-reports .etab').forEach(function(e){e.classList.remove('active');});evt.target.classList.add('active');}
+  if(name==='downtime'){
+    const d=await api('/api/reports/downtime');
+    fill('report-table',table([['equipment_name','Equipment'],['equipment_status','Status'],['breakdown_count','Breakdowns'],['total_downtime_days','Downtime (days)'],['open_breakdowns','Open']],d.summary,STATUSCOLS));return;
+  }
+  const r=REPORTS[name],rows=await api(r[1]);
+  fill('report-table',table(r[0],rows,STATUSCOLS));
+}
+(async function init(){
+  try{await loadBootstrap();fillSelects();renderDashboard();}
+  catch(e){toast('Cannot reach database',e.message,'error');}
+})();
+</script>
+</body>
+</html>
